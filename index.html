@@ -353,7 +353,8 @@
     // -----------------------------
     // Put your backend endpoint here, e.g. "https://your-api.com/flight?hkg=HKG&cts=CTS"
     // Expected JSON: { priceHKD: 3280, updatedAt: "2026-06-29 10:20" }
-    const FLIGHT_API_ENDPOINT = "";
+    const FLIGHT_API_ENDPOINT = "./flight.json";
+    const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 min
 
     const flightStatus = document.getElementById("flightStatus");
     const flightPrice = document.getElementById("flightPrice");
@@ -361,16 +362,11 @@
     const refreshFlightBtn = document.getElementById("refreshFlight");
 
     async function refreshFlightPrice() {
-      if (!FLIGHT_API_ENDPOINT) {
-        flightStatus.textContent = "Not connected";
-        flightPrice.textContent = "HKD --";
-        flightUpdated.textContent = "--";
-        return;
-      }
-
       try {
         flightStatus.textContent = "Loading...";
-        const res = await fetch(FLIGHT_API_ENDPOINT, { cache: "no-store" });
+        const res = await fetch(`${FLIGHT_API_ENDPOINT}?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
         const data = await res.json();
         flightPrice.textContent = "HKD " + (data.priceHKD ?? "--");
         flightUpdated.textContent = data.updatedAt ?? new Date().toLocaleString();
@@ -379,10 +375,13 @@
         flightStatus.textContent = "Error";
       }
     }
-
     refreshFlightBtn.addEventListener("click", refreshFlightPrice);
-    setInterval(refreshFlightPrice, 24 * 60 * 60 * 1000); // every 24 hours
+    setInterval(refreshFlightPrice, AUTO_REFRESH_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshFlightPrice();
+    });
     refreshFlightPrice();
+
 
     // -----------------------------
     // 3) Cost calculator + budget rule
