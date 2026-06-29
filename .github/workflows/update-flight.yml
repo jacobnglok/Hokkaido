@@ -2,7 +2,7 @@ name: Update flight.json from Google Flights
 
 on:
   schedule:
-    - cron: "0 */4 * * *"   # every 4 hours (UTC)
+    - cron: "0 */4 * * *"
   workflow_dispatch:
 
 permissions:
@@ -12,11 +12,14 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
+
+      - name: Install deps
+        run: npm ci
 
       - name: Update flight.json
         env:
