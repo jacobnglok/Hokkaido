@@ -196,7 +196,7 @@
       </div>
       <div class="row">
         <button id="refreshFlight" class="primary">Refresh now</button>
-        <a class="btn" target="_blank"
+        <a class="btn" target="_blank" rel="noopener noreferrer"
            href="https://www.google.com/travel/flights">Open Google Flights</a>
       </div>
       <p class="muted" style="margin-top:10px;">
@@ -319,8 +319,8 @@
     <section class="card links">
       <h2>Reference</h2>
       <ul>
-        <li><a target="_blank" href="https://www.letsgojp.com/archives/372783/">Hokkaido guide (LetsGoJP)</a></li>
-        <li><a target="_blank" href="https://www.google.com/travel/flights">Google Flights saved link</a></li>
+        <li><a target="_blank" rel="noopener noreferrer" href="https://www.letsgojp.com/archives/372783/">Hokkaido guide (LetsGoJP)</a></li>
+        <li><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/travel/flights">Google Flights saved link</a></li>
       </ul>
     </section>
   </div>
@@ -354,7 +354,7 @@
     // Put your backend endpoint here, e.g. "https://your-api.com/flight?hkg=HKG&cts=CTS"
     // Expected JSON: { priceHKD: 3280, updatedAt: "2026-06-29 10:20" }
     const FLIGHT_API_ENDPOINT = "./flight.json";
-    const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 min
+    const AUTO_REFRESH_MS = 24 * 60 * 60 * 1000; // 24 hours
 
     const flightStatus = document.getElementById("flightStatus");
     const flightPrice = document.getElementById("flightPrice");
@@ -381,7 +381,6 @@
       if (!document.hidden) refreshFlightPrice();
     });
     refreshFlightPrice();
-
 
     // -----------------------------
     // 3) Cost calculator + budget rule
@@ -432,7 +431,10 @@
         document.getElementById("totalDay" + (i+1)).textContent = hkd(dayTotals[i]);
       }
 
-      if (totalActual > totalBudget) {
+      if (totalBudget === 0 && totalActual === 0) {
+        budgetWarning.style.color = "#6b7280";
+        budgetWarning.textContent = "Enter budget and expenses to start tracking.";
+      } else if (totalActual > totalBudget) {
         budgetWarning.style.color = "#b91c1c";
         budgetWarning.textContent =
           `⚠ Over budget by ${hkd(totalActual - totalBudget)} (Total Actual: ${hkd(totalActual)} / Budget: ${hkd(totalBudget)})`;
@@ -443,10 +445,48 @@
       }
     }
 
-    document.querySelectorAll("#costTable input[type='number']").forEach(input => {
-      input.addEventListener("input", updateCosts);
+    // -----------------------------
+    // 4) Persist budget data (localStorage)
+    // -----------------------------
+    const STORAGE_KEY = "hokkaido_trip_budget_v1";
+
+    function getEditableCostInputs() {
+      // only editable number fields (exclude readonly Actual Expenses)
+      return Array.from(
+        document.querySelectorAll("#costTable input[type='number']:not([readonly])")
+      );
+    }
+
+    function saveBudgetData() {
+      const values = getEditableCostInputs().map(input => input.value);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    }
+
+    function loadBudgetData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+
+        const values = JSON.parse(raw);
+        const inputs = getEditableCostInputs();
+        inputs.forEach((input, idx) => {
+          if (values[idx] !== undefined) {
+            input.value = values[idx];
+          }
+        });
+      } catch (e) {
+        console.warn("Failed to load saved budget data:", e);
+      }
+    }
+
+    getEditableCostInputs().forEach(input => {
+      input.addEventListener("input", () => {
+        updateCosts();
+        saveBudgetData();
+      });
     });
 
+    loadBudgetData();
     updateCosts();
   </script>
 </body>
