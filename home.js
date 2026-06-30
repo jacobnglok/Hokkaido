@@ -48,21 +48,28 @@
   }
 
   // ✅ Hong Kong time formatter (what you asked for)
-  function formatHongKongTime(dateInput) {
-    const date = new Date(dateInput);
-    if (Number.isNaN(date.getTime())) return "Invalid date";
+    function formatHongKongTime(dateInput) {
+      let raw = dateInput;
 
-    return new Intl.DateTimeFormat("en-HK", {
-      timeZone: "Asia/Hong_Kong",
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false
-    }).format(date);
-  }
+      // If format is "YYYY-MM-DD HH:mm:ss", normalize to UTC ISO
+      if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw)) {
+        raw = raw.replace(" ", "T") + "Z";
+      }
+
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) return "Invalid date";
+
+      return new Intl.DateTimeFormat("en-HK", {
+        timeZone: "Asia/Hong_Kong",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(d);
+    }
 
   // -----------------------------
   // Currency Helper
