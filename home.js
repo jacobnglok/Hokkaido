@@ -16,7 +16,6 @@
     to: "home_currency_to"
   };
 
-  // Use your local flight.json file
   const FLIGHT_JSON_URL = "./flight.json";
 
   // -----------------------------
@@ -47,11 +46,10 @@
     }
   }
 
-  // Hong Kong time formatter
   function formatHongKongTime(dateInput) {
     let raw = dateInput;
 
-    // If format is "YYYY-MM-DD HH:mm:ss", normalize to UTC ISO
+    // If format is "YYYY-MM-DD HH:mm:ss", normalize to ISO UTC
     if (
       typeof raw === "string" &&
       /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw)
@@ -96,23 +94,17 @@
 
     if (!from || !to) return;
 
-    // Save user choices
     localStorage.setItem(STORAGE_KEYS.amount, String(amount));
     localStorage.setItem(STORAGE_KEYS.from, from);
     localStorage.setItem(STORAGE_KEYS.to, to);
 
     if (from === to) {
-      if (currencyEls.result) {
-        currencyEls.result.textContent = money(amount, to);
-      }
-      if (currencyEls.rate) {
-        currencyEls.rate.textContent = `1 ${from} = 1 ${to}`;
-      }
+      if (currencyEls.result) currencyEls.result.textContent = money(amount, to);
+      if (currencyEls.rate) currencyEls.rate.textContent = `1 ${from} = 1 ${to}`;
       return;
     }
 
     try {
-      // Free endpoint (no key needed)
       const res = await fetch(
         `https://open.er-api.com/v6/latest/${encodeURIComponent(from)}`
       );
@@ -125,19 +117,11 @@
       const rate = Number(data.rates[to]);
       const converted = amount * rate;
 
-      if (currencyEls.result) {
-        currencyEls.result.textContent = money(converted, to);
-      }
-      if (currencyEls.rate) {
-        currencyEls.rate.textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
-      }
+      if (currencyEls.result) currencyEls.result.textContent = money(converted, to);
+      if (currencyEls.rate) currencyEls.rate.textContent = `1 ${from} = ${rate.toFixed(4)} ${to}`;
     } catch (err) {
-      if (currencyEls.result) {
-        currencyEls.result.textContent = "Unable to convert right now.";
-      }
-      if (currencyEls.rate) {
-        currencyEls.rate.textContent = "Please try again.";
-      }
+      if (currencyEls.result) currencyEls.result.textContent = "Unable to convert right now.";
+      if (currencyEls.rate) currencyEls.rate.textContent = "Please try again.";
       console.error("[Currency] conversion failed:", err);
     }
   }
@@ -194,8 +178,6 @@
   };
 
   function normalizeFlightItems(data) {
-    // Supports multiple possible JSON shapes:
-    // { flights: [...] } OR { routes: [...] } OR [...]
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.flights)) return data.flights;
     if (Array.isArray(data?.routes)) return data.routes;
@@ -240,7 +222,6 @@
     if (flightEls.status) flightEls.status.textContent = "Loading flight data...";
 
     try {
-      // cache: "no-store" to avoid stale browser cache for latest prices
       const res = await fetch(FLIGHT_JSON_URL, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -248,7 +229,6 @@
       const items = normalizeFlightItems(data);
       renderFlightList(items);
 
-      // Prefer timestamp from JSON; fallback to now
       const ts =
         data?.updatedAt ||
         data?.lastUpdated ||
@@ -276,7 +256,6 @@
     restoreCurrencyInputs();
     bindCurrencyEvents();
 
-    // auto-run once on page load if currency UI exists
     if (currencyEls.amount && currencyEls.from && currencyEls.to) {
       convertCurrency();
     }
