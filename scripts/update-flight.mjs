@@ -16,28 +16,47 @@ const params = new URLSearchParams({
 });
 
 const url = `https://serpapi.com/search.json?${params.toString()}`;
+console.log("Fetching:", url.replace(apiKey, "***"));
+
 const res = await fetch(url);
-if (!res.ok) throw new Error(`SerpAPI HTTP ${res.status}`);
+const data = await res.json().catch(() => ({}));
 
-const data = await res.json();
+if (!res.ok) {
+  throw new Error(`SerpAPI HTTP ${res.status}: ${JSON.stringify(data).slice(0, 500)}`);
+}
+if (data?.error) {
+  throw new Error(`SerpAPI error: ${data.error}`);
+}
 
-// Try to find a price safely
-const getPrice = (obj) => {
-  if (!obj) return null;
-  if (typeof obj.price === "number") return obj.price;
-  if (typeof obj.price === "string") {
-    const n = Number(obj.price.replace(/[^\d.]/g, ""));
+const parsePrice = (v) => {
+  if (typeof v === "number") return v;
+  if (typeof v === "string") {
+    const n = Number(v.replace(/[^\d.]/g, ""));
     return Number.isFinite(n) ? n : null;
   }
   return null;
 };
 
-let price =
-  getPrice(data?.best_flights?.[0]) ??
-  getPrice(data?.other_flights?.[0]) ??
-  null;
+const candidates = [
+  data?.best_flights?.[0]?.price,
+  data?.other_flights?.[0]?.price,
+  data?.price_insights?.lowest_price,
+  data?.price_insights?.price
+];
 
-if (price == null) throw new Error("No price found in API response");
+let price = null;
+for (const c of candidates) {
+  price = parsePrice(c);
+  if (price != null) break;
+}
+
+if (price == null) {
+  console.log("No price found. Top-level keys:", Object.keys(data || {}));
+  console.log("best_flights length:", data?.best_flights?.length ?? 0);
+  console.log("other_flights length:", data?.other_flights?.length ?? 0);
+  console.log("price_insights:", data?.price_insights ?? null);
+  throw new Error("No price found in API response");
+}
 
 const output = {
   priceHKD: price,
