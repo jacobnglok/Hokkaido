@@ -185,7 +185,7 @@
   const flightEls = {
     status: qs(["#flight-status"]),
     list: qs(["#flight-list", "#flight-container"]),
-    lastUpdated: qs(["#last-updated", "#flight-last-updated"])
+    updatedAt: qs(["#last-updated", "#flight-last-updated"])
   };
 
   function normalizeFlightItems(data) {
@@ -243,10 +243,10 @@
       const items = normalizeFlightItems(data);
       renderFlightList(items);
 
-      // lastUpdated from JSON preferred; fallback to now
-      const ts = data?.lastUpdated || new Date().toISOString();
-      if (flightEls.lastUpdated) {
-        flightEls.lastUpdated.textContent = `Last updated: ${formatHongKongTime(ts)} (HKT)`;
+      // updatedAt from JSON preferred; fallback to now
+      const ts = data?.updatedAt || new Date().toISOString();
+      if (flightEls.updatedAt) {
+        flightEls.updatedAt.textContent = `Last updated: ${formatHongKongTime(ts)} (HKT)`;
       }
 
       if (flightEls.status) {
