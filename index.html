@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#2563eb" />
   <link rel="manifest" href="./manifest.json" />
-  <title>Hokkaido Trip Planner (15 Dec – 21 Dec)</title>
+  <title>Hokkaido Trip Planner • Home</title>
+
   <style>
     :root{
       --bg:#f7f8fb;
@@ -16,21 +17,27 @@
       --brand:#2563eb;
       --brand-soft:#eff6ff;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       background:var(--bg);
       color:var(--text);
       font-family:Arial, Helvetica, sans-serif;
       line-height:1.45;
+      padding-bottom:calc(72px + env(safe-area-inset-bottom));
     }
+
     .container{
       max-width:1100px;
       margin:24px auto;
-      padding:0 16px 32px;
+      padding:0 16px 24px;
     }
+
     h1{margin:0 0 6px;font-size:1.8rem}
     .subtitle{color:var(--muted); margin-bottom:20px}
+
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -39,6 +46,7 @@
       margin-bottom:16px;
       box-shadow:0 2px 8px rgba(0,0,0,0.03);
     }
+
     h2{
       font-size:1.1rem;
       margin:0 0 12px;
@@ -65,7 +73,7 @@
       min-width:180px;
     }
 
-    select, button, a.btn, textarea, input{
+    select, button, a.btn, input{
       border:1px solid var(--line);
       border-radius:10px;
       padding:10px 12px;
@@ -75,7 +83,12 @@
       text-decoration:none;
       display:inline-block;
     }
-    button, a.btn, select{ cursor:pointer; min-height:44px; }
+
+    button, a.btn, select{
+      cursor:pointer;
+      min-height:44px;
+    }
+
     button.primary{
       background:var(--brand);
       color:#fff;
@@ -87,15 +100,15 @@
       outline-offset:2px;
     }
 
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .muted{color:var(--muted)}
-    .detail-box{
-      margin-top:10px;
-      padding:12px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#fafafa;
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
+
+    .muted{color:var(--muted)}
+
     .flight-status{
       display:inline-block;
       font-size:0.8rem;
@@ -106,6 +119,7 @@
       border:1px solid #fed7aa;
       margin-bottom:8px;
     }
+
     .flight-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -119,155 +133,34 @@
       border:1px solid var(--line);
       border-radius:8px;
       font-size:0.9rem;
-      text-align:right;
-    }
-    input[readonly]{
-      background:#f3f4f6;
-      font-weight:600;
     }
 
-    .over-budget{
-      background:#ffe8e8 !important;
-      border-color:#e11d48 !important;
-      color:#b91c1c !important;
-      font-weight:700;
-    }
-    .ok-budget{
-      background:#ecfdf3 !important;
-      border-color:#16a34a !important;
-      color:#166534 !important;
-      font-weight:600;
-    }
-
-    #budgetWarning{
-      margin-top:10px;
-      font-size:0.92rem;
-      font-weight:700;
+    /* Bottom Nav */
+    .bottom-nav{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      background:#fff;
+      border-top:1px solid var(--line);
+      z-index:999;
+      padding-bottom:env(safe-area-inset-bottom);
     }
 
-    .links a{
-      color:var(--brand);
+    .bottom-nav a{
+      text-align:center;
+      padding:12px 6px;
       text-decoration:none;
-    }
-
-    .cost-cards{display:grid; gap:12px;}
-    .cost-card{
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:12px;
-    }
-
-    .cost-card-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      margin-bottom:10px;
-      flex-wrap:wrap;
-    }
-
-    .cost-title{font-weight:700; font-size:0.98rem;}
-    .cost-top-fields{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:10px;
-    }
-
-    .field label{
-      display:block;
-      font-size:0.8rem;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-
-    .day-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:10px;
-    }
-
-    .fx-note{
-      margin-top:4px;
-      font-size:0.78rem;
-      color:var(--muted);
-    }
-
-    .totals-card{
-      margin-top:12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:12px;
-    }
-
-    .totals-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px 12px;
+      color:#6b7280;
+      font-weight:600;
       font-size:0.92rem;
     }
 
-    .total-item{
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#f9fafb;
-    }
-
-    .total-item strong{
-      display:block;
-      font-size:0.78rem;
-      color:var(--muted);
-      margin-bottom:3px;
-      font-weight:600;
-    }
-
-    .two-col{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-    }
-
-    .checklist-list{
-      margin:0;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:8px;
-    }
-    .check-item{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      background:#fafafa;
-      border:1px solid var(--line);
-      border-radius:10px;
-      padding:10px;
-    }
-    .check-item input[type="checkbox"]{
-      width:20px;
-      height:20px;
-      margin-top:2px;
-      accent-color:var(--brand);
-    }
-
-    textarea{
-      width:100%;
-      min-height:110px;
-      resize:vertical;
-    }
-
-    @media (min-width:700px){
-      .day-grid{grid-template-columns:repeat(4, minmax(0,1fr));}
-      .totals-grid{grid-template-columns:repeat(3, minmax(0,1fr));}
-      .two-col{grid-template-columns:1fr 1fr;}
-    }
-
-    @media (min-width:1000px){
-      .day-grid{grid-template-columns:repeat(7, minmax(0,1fr));}
-      .totals-grid{grid-template-columns:repeat(5, minmax(0,1fr));}
+    .bottom-nav a.active{
+      color:var(--brand);
+      background:var(--brand-soft);
     }
 
     @media (max-width:640px){
@@ -278,12 +171,12 @@
     }
   </style>
 </head>
-<body>
+<body data-page="home">
   <div class="container">
     <h1>Hokkaido Trip Planner</h1>
     <div class="subtitle">Hong Kong (HKG) → Hokkaido / New Chitose (CTS) • 15 Dec – 21 Dec</div>
 
-    <!-- Trip Agenda -->
+    <!-- 1) Trip Agenda -->
     <section class="card">
       <h2>Trip Agenda</h2>
       <table>
@@ -302,363 +195,86 @@
       </table>
     </section>
 
-    <!-- Detailed Agenda Dropdown + Checklist + Notes -->
-    <section class="card">
-      <h2>Detailed Trip Agenda (Dropdown)</h2>
-      <div class="row">
-        <label for="daySelect"><strong>Choose a day:</strong></label>
-        <select id="daySelect" aria-label="Choose day for detail, checklist and notes">
-          <option value="d1">15 Dec (Day 1)</option>
-          <option value="d2">16 Dec (Day 2)</option>
-          <option value="d3">17 Dec (Day 3)</option>
-          <option value="d4">18 Dec (Day 4)</option>
-          <option value="d5">19 Dec (Day 5)</option>
-          <option value="d6">20 Dec (Day 6)</option>
-          <option value="d7">21 Dec (Day 7)</option>
-        </select>
-      </div>
-      <div id="dayDetail" class="detail-box" aria-live="polite"></div>
-
-      <div class="two-col" style="margin-top:12px;">
-        <div class="detail-box">
-          <strong>Checklist (per day)</strong>
-          <ul id="checklistContainer" class="checklist-list" style="margin-top:10px;"></ul>
-        </div>
-        <div class="detail-box">
-          <strong>Notes + Links (per day)</strong>
-          <div style="margin-top:10px;">
-            <label for="dayNotes"><strong>Notes</strong></label>
-            <textarea id="dayNotes" placeholder="e.g., dinner at 7pm, train platform info..."></textarea>
-          </div>
-          <div style="margin-top:10px;">
-            <label for="dayLinks"><strong>Links (one URL per line)</strong></label>
-            <textarea id="dayLinks" placeholder="https://..."></textarea>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Currency Helper -->
+    <!-- 2) Currency Helper -->
     <section class="card">
       <h2>Currency Helper (HKD ↔ JPY)</h2>
       <div class="row">
         <label for="fxRate"><strong>Exchange Rate (1 HKD = ? JPY)</strong></label>
         <input id="fxRate" type="number" min="0.01" step="0.0001" value="20" style="max-width:220px;" aria-label="Exchange rate from HKD to JPY" />
       </div>
+
       <div class="row" style="margin-top:10px;">
         <strong>Display totals in:</strong>
         <label><input type="radio" name="displayCurrency" value="HKD" checked /> HKD</label>
         <label><input type="radio" name="displayCurrency" value="JPY" /> JPY</label>
       </div>
-      <p class="muted" style="margin-top:8px;">Inputs stay in HKD. Converted values are shown under each amount.</p>
+
+      <p class="muted" style="margin-top:8px;">
+        Saved in browser. Other pages (Agenda/Budget) will use the same currency preference.
+      </p>
     </section>
 
-    <!-- Flight Tracker -->
+    <!-- 3) Flight Price Tracker -->
     <section class="card">
       <h2>Flight Price Tracker</h2>
       <div id="flightStatus" class="flight-status" role="status" aria-live="polite">Not connected</div>
+
       <div class="flight-grid">
         <div><strong>Route:</strong><br>HKG ↔ CTS • 15 Dec → 21 Dec</div>
         <div><strong>Current Price:</strong><br><span id="flightPrice">HKD --</span></div>
         <div><strong>Last updated:</strong><br><span id="flightUpdated">--</span></div>
       </div>
+
       <div class="row">
         <button id="refreshFlight" class="primary" aria-label="Refresh flight price now">Refresh now</button>
         <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.google.com/travel/flights">Open Google Flights</a>
       </div>
+
       <p class="muted" style="margin-top:10px;">
-        Auto-refresh runs every 24 hours. To enable live prices, set your backend API endpoint in this file.
+        Auto-refresh runs every 24 hours. To enable live prices, set your backend endpoint in <code>FLIGHT_API_ENDPOINT</code>.
       </p>
-    </section>
-
-    <!-- Cost Breakdown (Card UI) -->
-    <section class="card">
-      <h2>Cost Breakdown (HKD input)</h2>
-
-      <div id="costTable">
-        <div class="cost-cards">
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Round-trip Flight</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Hotel (6 nights)</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Transport (JR/metro/bus)</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Food</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Activities / Tickets</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-          <div class="cost-row cost-card">
-            <div class="cost-card-header"><div class="cost-title">Shopping / Misc.</div></div>
-            <div class="cost-top-fields">
-              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
-              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
-            </div>
-            <div class="day-grid">
-              <div class="field"><label>Day 1</label><input type="number" class="day-input day1" min="0" step="0.01"></div>
-              <div class="field"><label>Day 2</label><input type="number" class="day-input day2" min="0" step="0.01"></div>
-              <div class="field"><label>Day 3</label><input type="number" class="day-input day3" min="0" step="0.01"></div>
-              <div class="field"><label>Day 4</label><input type="number" class="day-input day4" min="0" step="0.01"></div>
-              <div class="field"><label>Day 5</label><input type="number" class="day-input day5" min="0" step="0.01"></div>
-              <div class="field"><label>Day 6</label><input type="number" class="day-input day6" min="0" step="0.01"></div>
-              <div class="field"><label>Day 7</label><input type="number" class="day-input day7" min="0" step="0.01"></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="totals-card">
-        <div class="totals-grid">
-          <div class="total-item"><strong>Total Budget</strong><span id="totalBudget">HKD 0</span></div>
-          <div class="total-item"><strong>Day 1 Total</strong><span id="totalDay1">HKD 0</span></div>
-          <div class="total-item"><strong>Day 2 Total</strong><span id="totalDay2">HKD 0</span></div>
-          <div class="total-item"><strong>Day 3 Total</strong><span id="totalDay3">HKD 0</span></div>
-          <div class="total-item"><strong>Day 4 Total</strong><span id="totalDay4">HKD 0</span></div>
-          <div class="total-item"><strong>Day 5 Total</strong><span id="totalDay5">HKD 0</span></div>
-          <div class="total-item"><strong>Day 6 Total</strong><span id="totalDay6">HKD 0</span></div>
-          <div class="total-item"><strong>Day 7 Total</strong><span id="totalDay7">HKD 0</span></div>
-          <div class="total-item"><strong>Total Actual</strong><span id="totalActual">HKD 0</span></div>
-        </div>
-      </div>
-
-      <div id="budgetWarning" role="status" aria-live="polite"></div>
-      <p class="muted">Tip: fill daily spending by category; Actual Expenses and totals update automatically.</p>
-    </section>
-
-    <section class="card links">
-      <h2>Reference</h2>
-      <ul>
-        <li><a target="_blank" rel="noopener noreferrer" href="https://www.letsgojp.com/archives/372783/">Hokkaido guide (LetsGoJP)</a></li>
-        <li><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/travel/flights">Google Flights saved link</a></li>
-      </ul>
     </section>
   </div>
 
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" aria-label="Bottom Navigation">
+    <a href="./index.html" data-page="home" class="active">🏠 Home</a>
+    <a href="./agenda.html" data-page="agenda">🗓 Agenda</a>
+    <a href="./budget.html" data-page="budget">💰 Budget</a>
+  </nav>
+
   <script>
     // -----------------------------
-    // Keys
+    // Storage keys
     // -----------------------------
-    const STORAGE_KEY = "hokkaido_trip_budget_v1";
     const FX_KEY = "hokkaido_trip_fx_v1";
-    const CHECKLIST_KEY = "hokkaido_trip_checklist_v1";
-    const NOTES_KEY = "hokkaido_trip_notes_v1";
 
     // -----------------------------
-    // 1) Detailed agenda dropdown
+    // Helpers
     // -----------------------------
-    const agendaDetails = {
-      d1: "Arrive CTS, JR to Sapporo, hotel check-in, dinner in Susukino.",
-      d2: "Otaru day trip: canal, Sakaimachi Street, seafood bowl, LeTAO dessert.",
-      d3: "Option A: Niseko ski day. Option B: Jozankei onsen and relax.",
-      d4: "Asahikawa: zoo visit + Asahikawa Ramen Village.",
-      d5: "Sapporo city: Odori Park, TV Tower, Nijo Market, Tanukikoji shopping.",
-      d6: "Noboribetsu day trip: Hell Valley + onsen.",
-      d7: "Last-minute shopping, transfer to CTS, fly back to HKG."
-    };
-
-    const defaultChecklistItems = [
-      "Passport / wallet / essentials",
-      "Transport route checked",
-      "Tickets / reservations ready",
-      "Weather + outfit ready",
-      "Power bank / charging cable packed"
-    ];
-
-    const daySelect = document.getElementById("daySelect");
-    const dayDetail = document.getElementById("dayDetail");
-    const checklistContainer = document.getElementById("checklistContainer");
-    const dayNotes = document.getElementById("dayNotes");
-    const dayLinks = document.getElementById("dayLinks");
-
     function readJSON(key, fallback) {
       try {
         const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        return JSON.parse(raw);
-      } catch { return fallback; }
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
     }
 
     function writeJSON(key, data) {
       localStorage.setItem(key, JSON.stringify(data));
     }
 
-    function currentDayKey() {
-      return daySelect.value;
+    function hkd(v) {
+      return "HKD " + (Number(v) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
     }
 
-    function renderDayDetail() {
-      dayDetail.textContent = agendaDetails[currentDayKey()] || "";
+    function jpy(v) {
+      return "JPY " + Math.round(Number(v) || 0).toLocaleString();
     }
-
-    function renderChecklistAndNotes() {
-      const d = currentDayKey();
-
-      // checklist
-      const allChecklist = readJSON(CHECKLIST_KEY, {});
-      const dayState = allChecklist[d] || defaultChecklistItems.map(() => false);
-      checklistContainer.innerHTML = "";
-
-      defaultChecklistItems.forEach((item, idx) => {
-        const li = document.createElement("li");
-        li.className = "check-item";
-
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.checked = !!dayState[idx];
-        cb.setAttribute("aria-label", `${item} for ${d}`);
-        cb.addEventListener("change", () => {
-          const latest = readJSON(CHECKLIST_KEY, {});
-          const arr = latest[d] || defaultChecklistItems.map(() => false);
-          arr[idx] = cb.checked;
-          latest[d] = arr;
-          writeJSON(CHECKLIST_KEY, latest);
-        });
-
-        const text = document.createElement("span");
-        text.textContent = item;
-
-        li.appendChild(cb);
-        li.appendChild(text);
-        checklistContainer.appendChild(li);
-      });
-
-      // notes + links
-      const allNotes = readJSON(NOTES_KEY, {});
-      dayNotes.value = allNotes[d]?.notes || "";
-      dayLinks.value = allNotes[d]?.links || "";
-    }
-
-    function saveNotesForCurrentDay() {
-      const d = currentDayKey();
-      const allNotes = readJSON(NOTES_KEY, {});
-      allNotes[d] = {
-        notes: dayNotes.value,
-        links: dayLinks.value
-      };
-      writeJSON(NOTES_KEY, allNotes);
-    }
-
-    daySelect.addEventListener("change", () => {
-      renderDayDetail();
-      renderChecklistAndNotes();
-    });
-    dayNotes.addEventListener("input", saveNotesForCurrentDay);
-    dayLinks.addEventListener("input", saveNotesForCurrentDay);
-
-    renderDayDetail();
-    renderChecklistAndNotes();
 
     // -----------------------------
-    // 2) Flight tracker (stub/live)
-    // -----------------------------
-    const FLIGHT_API_ENDPOINT = "./flight.json";
-    const AUTO_REFRESH_MS = 24 * 60 * 60 * 1000;
-
-    const flightStatus = document.getElementById("flightStatus");
-    const flightPrice = document.getElementById("flightPrice");
-    const flightUpdated = document.getElementById("flightUpdated");
-    const refreshFlightBtn = document.getElementById("refreshFlight");
-
-    async function refreshFlightPrice() {
-      try {
-        flightStatus.textContent = "Loading...";
-        const res = await fetch(`${FLIGHT_API_ENDPOINT}?t=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-
-        const data = await res.json();
-        const p = Number(data.priceHKD ?? 0);
-        flightPrice.textContent = displayMoney(p);
-        flightUpdated.textContent = data.updatedAt ?? new Date().toLocaleString();
-        flightStatus.textContent = "Connected";
-      } catch (e) {
-        flightStatus.textContent = "Error";
-      }
-    }
-
-    refreshFlightBtn.addEventListener("click", refreshFlightPrice);
-    setInterval(refreshFlightPrice, AUTO_REFRESH_MS);
-    document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) refreshFlightPrice();
-    });
-
-    // -----------------------------
-    // 3) Currency helper
+    // Currency helper
     // -----------------------------
     const fxRateInput = document.getElementById("fxRate");
     const displayCurrencyRadios = Array.from(document.querySelectorAll("input[name='displayCurrency']"));
@@ -670,179 +286,91 @@
     function fxRate() {
       return Math.max(0.0001, Number(fxRateInput.value) || 20);
     }
+
     function displayCurrency() {
       const selected = displayCurrencyRadios.find(r => r.checked);
       return selected ? selected.value : "HKD";
     }
-    function hkd(v) {
-      return "HKD " + (Number(v) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    }
+
     function jpyFromHkd(hkdValue) {
       return (Number(hkdValue) || 0) * fxRate();
     }
-    function jpy(v) {
-      return "JPY " + Math.round(Number(v) || 0).toLocaleString();
-    }
+
     function displayMoney(hkdValue) {
-      return displayCurrency() === "JPY" ? jpy(jpyFromHkd(hkdValue)) : hkd(hkdValue);
-    }
-    function saveFxState() {
-      writeJSON(FX_KEY, { rate: fxRate(), display: displayCurrency() });
+      return displayCurrency() === "JPY"
+        ? jpy(jpyFromHkd(hkdValue))
+        : hkd(hkdValue);
     }
 
+    function saveFxState() {
+      writeJSON(FX_KEY, {
+        rate: fxRate(),
+        display: displayCurrency()
+      });
+    }
+
+    // -----------------------------
+    // Flight tracker
+    // -----------------------------
+    const FLIGHT_API_ENDPOINT = "./flight.json";
+    const AUTO_REFRESH_MS = 24 * 60 * 60 * 1000;
+
+    const flightStatus = document.getElementById("flightStatus");
+    const flightPrice = document.getElementById("flightPrice");
+    const flightUpdated = document.getElementById("flightUpdated");
+    const refreshFlightBtn = document.getElementById("refreshFlight");
+
+    let lastFlightPriceHKD = null;
+
+    function renderFlightPrice() {
+      flightPrice.textContent =
+        lastFlightPriceHKD == null ? "HKD --" : displayMoney(lastFlightPriceHKD);
+    }
+
+    async function refreshFlightPrice() {
+      try {
+        flightStatus.textContent = "Loading...";
+        const res = await fetch(`${FLIGHT_API_ENDPOINT}?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const data = await res.json();
+        lastFlightPriceHKD = Number(data.priceHKD ?? 0);
+
+        renderFlightPrice();
+        flightUpdated.textContent = data.updatedAt ?? new Date().toLocaleString();
+        flightStatus.textContent = "Connected";
+      } catch (e) {
+        flightStatus.textContent = "Error";
+      }
+    }
+
+    // FX changes should only re-render price display, not re-fetch API
     fxRateInput.addEventListener("input", () => {
       saveFxState();
-      updateCosts();
-      refreshFlightPrice();
+      renderFlightPrice();
     });
-    displayCurrencyRadios.forEach(r => r.addEventListener("change", () => {
-      saveFxState();
-      updateCosts();
-      refreshFlightPrice();
-    }));
 
-    // -----------------------------
-    // 4) Cost calculator + budget rule
-    // -----------------------------
-    const rows = Array.from(document.querySelectorAll(".cost-row"));
-    const budgetWarning = document.getElementById("budgetWarning");
-
-    function num(v) { return parseFloat(v) || 0; }
-
-    function attachAccessibilityAndFxNotes() {
-      rows.forEach((row) => {
-        const title = row.querySelector(".cost-title")?.textContent?.trim() || "Category";
-        const budgetInput = row.querySelector(".budget-input");
-        const actualInput = row.querySelector(".actual-input");
-        const dayInputs = Array.from(row.querySelectorAll(".day-input"));
-
-        if (budgetInput) {
-          budgetInput.setAttribute("aria-label", `${title} budget in HKD`);
-          budgetInput.setAttribute("inputmode", "decimal");
-          addFxNote(budgetInput);
-        }
-        if (actualInput) {
-          actualInput.setAttribute("aria-label", `${title} actual expense in HKD`);
-          addFxNote(actualInput);
-        }
-        dayInputs.forEach((input, idx) => {
-          input.setAttribute("aria-label", `${title} Day ${idx + 1} expense in HKD`);
-          input.setAttribute("inputmode", "decimal");
-          addFxNote(input);
-        });
-      });
-    }
-
-    function addFxNote(inputEl) {
-      const parent = inputEl.parentElement;
-      if (!parent || parent.querySelector(".fx-note")) return;
-      const note = document.createElement("div");
-      note.className = "fx-note";
-      note.textContent = "≈ JPY 0";
-      parent.appendChild(note);
-    }
-
-    function updateFxNotes() {
-      document.querySelectorAll("#costTable .field").forEach(field => {
-        const input = field.querySelector("input[type='number']");
-        const note = field.querySelector(".fx-note");
-        if (!input || !note) return;
-        const hkdValue = num(input.value);
-        note.textContent = `≈ ${jpy(jpyFromHkd(hkdValue))}`;
-      });
-    }
-
-    function updateCosts() {
-      let totalBudget = 0;
-      let totalActual = 0;
-      const dayTotals = [0,0,0,0,0,0,0];
-
-      rows.forEach(row => {
-        const budgetInput = row.querySelector(".budget-input");
-        const dayInputs = Array.from(row.querySelectorAll(".day-input"));
-        const actualInput = row.querySelector(".actual-input");
-
-        const budget = num(budgetInput.value);
-        const actual = dayInputs.reduce((s, input, idx) => {
-          const v = num(input.value);
-          dayTotals[idx] += v;
-          return s + v;
-        }, 0);
-
-        actualInput.value = actual.toFixed(2);
-        totalBudget += budget;
-        totalActual += actual;
-
-        actualInput.classList.remove("over-budget", "ok-budget");
-        if (actual > budget) {
-          actualInput.classList.add("over-budget");
-        } else if (budget > 0 || actual > 0) {
-          actualInput.classList.add("ok-budget");
-        }
-      });
-
-      document.getElementById("totalBudget").textContent = displayMoney(totalBudget);
-      document.getElementById("totalActual").textContent = displayMoney(totalActual);
-      for (let i = 0; i < 7; i++) {
-        document.getElementById("totalDay" + (i + 1)).textContent = displayMoney(dayTotals[i]);
-      }
-
-      if (totalBudget === 0 && totalActual === 0) {
-        budgetWarning.style.color = "#6b7280";
-        budgetWarning.textContent = "Enter budget and expenses to start tracking.";
-      } else if (totalActual > totalBudget) {
-        budgetWarning.style.color = "#b91c1c";
-        budgetWarning.textContent =
-          `⚠ Over budget by ${displayMoney(totalActual - totalBudget)} (Actual: ${displayMoney(totalActual)} / Budget: ${displayMoney(totalBudget)})`;
-      } else {
-        budgetWarning.style.color = "#166534";
-        budgetWarning.textContent = `✅ Within budget. Remaining: ${displayMoney(totalBudget - totalActual)}`;
-      }
-
-      updateFxNotes();
-    }
-
-    function getEditableCostInputs() {
-      return Array.from(document.querySelectorAll("#costTable input[type='number']:not([readonly])"));
-    }
-
-    function saveBudgetData() {
-      const values = getEditableCostInputs().map(input => input.value);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
-    }
-
-    function loadBudgetData() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const values = JSON.parse(raw);
-        const inputs = getEditableCostInputs();
-        inputs.forEach((input, idx) => {
-          if (values[idx] !== undefined) input.value = values[idx];
-        });
-              } catch (e) {
-        console.warn("Failed to load saved budget data:", e);
-      }
-    }
-
-    // bind cost input events
-    getEditableCostInputs().forEach(input => {
-      input.addEventListener("input", () => {
-        updateCosts();
-        saveBudgetData();
+    displayCurrencyRadios.forEach(r => {
+      r.addEventListener("change", () => {
+        saveFxState();
+        renderFlightPrice();
       });
     });
 
-    // accessibility + FX helper notes
-    attachAccessibilityAndFxNotes();
+    refreshFlightBtn.addEventListener("click", refreshFlightPrice);
 
-    // initial load
-    loadBudgetData();
-    updateCosts();
+    setInterval(refreshFlightPrice, AUTO_REFRESH_MS);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) refreshFlightPrice();
+    });
+
+    // initial
+    renderFlightPrice();
     refreshFlightPrice();
 
     // -----------------------------
-    // 5) PWA: register service worker
+    // PWA service worker
     // -----------------------------
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
