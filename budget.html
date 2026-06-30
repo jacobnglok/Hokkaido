@@ -1,1 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>Hokkaido Trip Planner • Budget</title>
+  <style>
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --brand:#2563eb;
+      --brand-soft:#eff6ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.45;
+      padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    }
+    .container{
+      max-width:1100px;
+      margin:24px auto;
+      padding:0 16px 24px;
+    }
+    h1{margin:0 0 6px;font-size:1.8rem}
+    .subtitle{color:var(--muted); margin-bottom:16px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.03);
+    }
+    h2{font-size:1.1rem; margin:0 0 12px;}
+    .muted{color:var(--muted); font-size:0.92rem;}
+
+    input[type="number"]{
+      width:100%;
+      padding:9px 10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      font-size:0.9rem;
+      text-align:right;
+      background:#fff;
+      color:var(--text);
+    }
+    input[readonly]{
+      background:#f3f4f6;
+      font-weight:600;
+    }
+    :focus-visible{
+      outline:3px solid #93c5fd;
+      outline-offset:2px;
+    }
+
+    .cost-cards{display:grid; gap:12px;}
+    .cost-card{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+    }
+    .cost-card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .cost-title{font-weight:700; font-size:0.98rem;}
+
+    .cost-top-fields{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .field label{
+      display:block;
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .day-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+
+    .fx-note{
+      margin-top:4px;
+      font-size:0.78rem;
+      color:var(--muted);
+    }
+
+    .totals-card{
+      margin-top:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:12px;
+    }
+    .totals-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px 12px;
+      font-size:0.92rem;
+    }
+    .total-item{
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#f9fafb;
+    }
+    .total-item strong{
+      display:block;
+      font-size:0.78rem;
+      color:var(--muted);
+      margin-bottom:3px;
+      font-weight:600;
+    }
+
+    .over-budget{
+      background:#ffe8e8 !important;
+      border-color:#e11d48 !important;
+      color:#b91c1c !important;
+      font-weight:700;
+    }
+    .ok-budget{
+      background:#ecfdf3 !important;
+      border-color:#16a34a !important;
+      color:#166534 !important;
+      font-weight:600;
+    }
+
+    #budgetWarning{
+      margin-top:10px;
+      font-size:0.92rem;
+      font-weight:700;
+    }
+
+    /* Bottom nav */
+    .bottom-nav{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      background:#fff;
+      border-top:1px solid var(--line);
+      z-index:999;
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    .bottom-nav a{
+      text-align:center;
+      padding:12px 8px;
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:600;
+      font-size:0.92rem;
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .bottom-nav a.active{
+      color:var(--brand);
+      background:var(--brand-soft);
+    }
+
+    @media (min-width:700px){
+      .day-grid{grid-template-columns:repeat(4, minmax(0,1fr));}
+      .totals-grid{grid-template-columns:repeat(3, minmax(0,1fr));}
+    }
+    @media (min-width:1000px){
+      .day-grid{grid-template-columns:repeat(7, minmax(0,1fr));}
+      .totals-grid{grid-template-columns:repeat(5, minmax(0,1fr));}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hokkaido Trip Planner</h1>
+    <div class="subtitle">Budget • 15 Dec – 21 Dec</div>
+
+    <section class="card">
+      <h2>Cost Breakdown (HKD input)</h2>
+      <p class="muted" style="margin-top:-6px;">
+        Display currency follows your Home page setting (HKD / JPY).
+      </p>
+
+      <div id="costTable">
+        <div class="cost-cards">
+
+          <!-- 1 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Round-trip Flight</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- 2 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Hotel (6 nights)</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- 3 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Transport (JR/metro/bus)</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- 4 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Food</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- 5 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Activities / Tickets</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- 6 -->
+          <div class="cost-row cost-card">
+            <div class="cost-card-header"><div class="cost-title">Shopping / Misc.</div></div>
+            <div class="cost-top-fields">
+              <div class="field"><label>Budget</label><input type="number" class="budget-input" min="0" step="0.01"></div>
+              <div class="field"><label>Actual Expenses</label><input type="number" class="actual-input" readonly></div>
+            </div>
+            <div class="day-grid">
+              <div class="field"><label>Day 1</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 2</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 3</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 4</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 5</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 6</label><input type="number" class="day-input" min="0" step="0.01"></div>
+              <div class="field"><label>Day 7</label><input type="number" class="day-input" min="0" step="0.01"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="totals-card">
+        <div class="totals-grid">
+          <div class="total-item"><strong>Total Budget</strong><span id="totalBudget">HKD 0</span></div>
+          <div class="total-item"><strong>Day 1 Total</strong><span id="totalDay1">HKD 0</span></div>
+          <div class="total-item"><strong>Day 2 Total</strong><span id="totalDay2">HKD 0</span></div>
+          <div class="total-item"><strong>Day 3 Total</strong><span id="totalDay3">HKD 0</span></div>
+          <div class="total-item"><strong>Day 4 Total</strong><span id="totalDay4">HKD 0</span></div>
+          <div class="total-item"><strong>Day 5 Total</strong><span id="totalDay5">HKD 0</span></div>
+          <div class="total-item"><strong>Day 6 Total</strong><span id="totalDay6">HKD 0</span></div>
+          <div class="total-item"><strong>Day 7 Total</strong><span id="totalDay7">HKD 0</span></div>
+          <div class="total-item"><strong>Total Actual</strong><span id="totalActual">HKD 0</span></div>
+        </div>
+      </div>
+
+      <div id="budgetWarning" role="status" aria-live="polite"></div>
+      <p class="muted">Tip: fill daily spending by category; Actual Expenses and totals update automatically.</p>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a href="./index.html">🏠 Home</a>
+    <a href="./agenda.html">🗓 Agenda</a>
+    <a href="./budget.html" class="active">💰 Budget</a>
+  </nav>
+
+  <script>
+    // -----------------------------
+    // Keys
+    // -----------------------------
+    const STORAGE_KEY = "hokkaido_trip_budget_v1";
+    const FX_KEY = "hokkaido_trip_fx_v1";
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function readJSON(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function num(v) { return parseFloat(v) || 0; }
+
+    function fxState() {
+      return readJSON(FX_KEY, { rate: 20, display: "HKD" });
+    }
+    function hkd(v) {
+      return "HKD " + (Number(v) || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+    function jpy(v) {
+      return "JPY " + Math.round(Number(v) || 0).toLocaleString();
+    }
+    function jpyFromHkd(hkdValue) {
+      const fx = fxState();
+      const rate = Math.max(0.0001, Number(fx.rate) || 20);
+      return (Number(hkdValue) || 0) * rate;
+    }
+    function displayMoney(hkdValue) {
+      const fx = fxState();
+      return fx.display === "JPY" ? jpy(jpyFromHkd(hkdValue)) : hkd(hkdValue);
+    }
+
+    // -----------------------------
+    // Cost calculator + budget rule
+    // -----------------------------
+    const rows = Array.from(document.querySelectorAll(".cost-row"));
+    const budgetWarning = document.getElementById("budgetWarning");
+
+    function addFxNote(inputEl) {
+      const parent = inputEl.parentElement;
+      if (!parent || parent.querySelector(".fx-note")) return;
+      const note = document.createElement("div");
+      note.className = "fx-note";
+      note.textContent = "≈ JPY 0";
+      parent.appendChild(note);
+    }
+
+    function attachAccessibilityAndFxNotes() {
+      rows.forEach((row) => {
+        const title = row.querySelector(".cost-title")?.textContent?.trim() || "Category";
+        const budgetInput = row.querySelector(".budget-input");
+        const actualInput = row.querySelector(".actual-input");
+        const dayInputs = Array.from(row.querySelectorAll(".day-input"));
+
+        if (budgetInput) {
+          budgetInput.setAttribute("aria-label", `${title} budget in HKD`);
+          budgetInput.setAttribute("inputmode", "decimal");
+          addFxNote(budgetInput);
+        }
+        if (actualInput) {
+          actualInput.setAttribute("aria-label", `${title} actual expense in HKD`);
+          addFxNote(actualInput);
+        }
+        dayInputs.forEach((input, idx) => {
+          input.setAttribute("aria-label", `${title} Day ${idx + 1} expense in HKD`);
+          input.setAttribute("inputmode", "decimal");
+          addFxNote(input);
+        });
+      });
+    }
+
+    function updateFxNotes() {
+      document.querySelectorAll("#costTable .field").forEach(field => {
+        const input = field.querySelector("input[type='number']");
+        const note = field.querySelector(".fx-note");
+        if (!input || !note) return;
+        note.textContent = `≈ ${jpy(jpyFromHkd(num(input.value)))}`;
+      });
+    }
+
+    function updateCosts() {
+      let totalBudget = 0;
+      let totalActual = 0;
+      const dayTotals = [0, 0, 0, 0, 0, 0, 0];
+
+      rows.forEach(row => {
+        const budgetInput = row.querySelector(".budget-input");
+        const dayInputs = Array.from(row.querySelectorAll(".day-input"));
+        const actualInput = row.querySelector(".actual-input");
+
+        const budget = num(budgetInput.value);
+        const actual = dayInputs.reduce((sum, input, idx) => {
+          const v = num(input.value);
+          dayTotals[idx] += v;
+          return sum + v;
+        }, 0);
+
+        actualInput.value = actual.toFixed(2);
+        totalBudget += budget;
+        totalActual += actual;
+
+        actualInput.classList.remove("over-budget", "ok-budget");
+        if (actual > budget) {
+          actualInput.classList.add("over-budget");
+        } else if (budget > 0 || actual > 0) {
+          actualInput.classList.add("ok-budget");
+        }
+      });
+
+      document.getElementById("totalBudget").textContent = displayMoney(totalBudget);
+      document.getElementById("totalActual").textContent = displayMoney(totalActual);
+      for (let i = 0; i < 7; i++) {
+        document.getElementById("totalDay" + (i + 1)).textContent = displayMoney(dayTotals[i]);
+      }
+
+      if (totalBudget === 0 && totalActual === 0) {
+        budgetWarning.style.color = "#6b7280";
+        budgetWarning.textContent = "Enter budget and expenses to start tracking.";
+      } else if (totalActual > totalBudget) {
+        budgetWarning.style.color = "#b91c1c";
+        budgetWarning.textContent =
+          `⚠ Over budget by ${displayMoney(totalActual - totalBudget)} (Actual: ${displayMoney(totalActual)} / Budget: ${displayMoney(totalBudget)})`;
+      } else {
+        budgetWarning.style.color = "#166534";
+        budgetWarning.textContent = `✅ Within budget. Remaining: ${displayMoney(totalBudget - totalActual)}`;
+      }
+
+      updateFxNotes();
+    }
+
+    function getEditableCostInputs() {
+      return Array.from(document.querySelectorAll("#costTable input[type='number']:not([readonly])"));
+    }
+
+    function saveBudgetData() {
+      const values = getEditableCostInputs().map(input => input.value);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(values));
+    }
+
+    function loadBudgetData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const values = JSON.parse(raw);
+        const inputs = getEditableCostInputs();
+        inputs.forEach((input, idx) => {
+          if (values[idx] !== undefined) input.value = values[idx];
+        });
+      } catch (e) {
+        console.warn("Failed to load budget data:", e);
+      }
+    }
+
+    // bind input events
+    getEditableCostInputs().forEach(input => {
+      input.addEventListener("input", () => {
+        updateCosts();
+        saveBudgetData();
+      });
+    });
+
+    // refresh display if FX changes in another tab
+    window.addEventListener("storage", (e) => {
+      if (e.key === FX_KEY) updateCosts();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) updateCosts();
+    });
+
+    // init
+    attachAccessibilityAndFxNotes();
+    loadBudgetData();
+    updateCosts();
+
+    // optional PWA SW registration
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
 
