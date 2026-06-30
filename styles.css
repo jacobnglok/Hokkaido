@@ -1,1 +1,31 @@
+body {
+  margin: 0;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
 
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav a {
+  text-align: center;
+  padding: 12px 6px;
+  text-decoration: none;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.bottom-nav a.active {
+  color: #2563eb;
+  background: #eff6ff;
+}
