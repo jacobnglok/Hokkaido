@@ -1,1 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>Hokkaido Trip Planner • Agenda</title>
+  <style>
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --brand:#2563eb;
+      --brand-soft:#eff6ff;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      line-height:1.45;
+      padding-bottom:calc(72px + env(safe-area-inset-bottom));
+    }
+
+    .container{
+      max-width:1100px;
+      margin:24px auto;
+      padding:0 16px 24px;
+    }
+
+    h1{margin:0 0 6px;font-size:1.8rem}
+    .subtitle{color:var(--muted); margin-bottom:20px}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    h2{
+      font-size:1.1rem;
+      margin:0 0 12px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .muted{color:var(--muted)}
+
+    select, textarea{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:0.93rem;
+      background:#fff;
+      color:var(--text);
+    }
+
+    select{
+      min-height:44px;
+      cursor:pointer;
+      min-width:220px;
+    }
+
+    textarea{
+      width:100%;
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .detail-box{
+      margin-top:10px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fafafa;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .checklist-list{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+
+    .check-item{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:10px;
+    }
+
+    .check-item input[type="checkbox"]{
+      width:20px;
+      height:20px;
+      margin-top:2px;
+      accent-color:var(--brand);
+    }
+
+    .saved-links{
+      margin-top:10px;
+      padding:10px;
+      background:#fff;
+      border:1px dashed var(--line);
+      border-radius:10px;
+    }
+
+    .saved-links ul{
+      margin:8px 0 0;
+      padding-left:18px;
+    }
+
+    .saved-links a{
+      color:var(--brand);
+      text-decoration:none;
+      word-break:break-all;
+    }
+
+    :focus-visible{
+      outline:3px solid #93c5fd;
+      outline-offset:2px;
+    }
+
+    /* Bottom nav */
+    .bottom-nav{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      background:#fff;
+      border-top:1px solid var(--line);
+      z-index:999;
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+
+    .bottom-nav a{
+      text-align:center;
+      padding:12px 6px;
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:600;
+      font-size:0.92rem;
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .bottom-nav a.active{
+      color:var(--brand);
+      background:var(--brand-soft);
+    }
+
+    @media (min-width:700px){
+      .two-col{grid-template-columns:1fr 1fr;}
+    }
+
+    @media (max-width:640px){
+      .row > *{width:100%}
+      select{width:100%}
+    }
+  </style>
+</head>
+<body data-page="agenda">
+  <div class="container">
+    <h1>Hokkaido Trip Planner</h1>
+    <div class="subtitle">Agenda • 15 Dec – 21 Dec</div>
+
+    <section class="card">
+      <h2>Detailed Trip Agenda (Dropdown)</h2>
+
+      <div class="row">
+        <label for="daySelect"><strong>Choose a day:</strong></label>
+        <select id="daySelect" aria-label="Choose day for detail, checklist and notes">
+          <option value="d1">15 Dec (Day 1)</option>
+          <option value="d2">16 Dec (Day 2)</option>
+          <option value="d3">17 Dec (Day 3)</option>
+          <option value="d4">18 Dec (Day 4)</option>
+          <option value="d5">19 Dec (Day 5)</option>
+          <option value="d6">20 Dec (Day 6)</option>
+          <option value="d7">21 Dec (Day 7)</option>
+        </select>
+      </div>
+
+      <div id="dayDetail" class="detail-box" aria-live="polite"></div>
+
+      <div class="two-col">
+        <div class="detail-box">
+          <strong>Checklist (per day)</strong>
+          <ul id="checklistContainer" class="checklist-list" style="margin-top:10px;"></ul>
+        </div>
+
+        <div class="detail-box">
+          <strong>Notes + Links (per day)</strong>
+
+          <div style="margin-top:10px;">
+            <label for="dayNotes"><strong>Notes</strong></label>
+            <textarea id="dayNotes" placeholder="e.g., dinner at 7pm, train platform info..."></textarea>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label for="dayLinks"><strong>Links (one URL per line)</strong></label>
+            <textarea id="dayLinks" placeholder="https://..."></textarea>
+          </div>
+
+          <div class="saved-links" id="savedLinksPreview">
+            <strong>Saved links preview</strong>
+            <ul id="savedLinksList"></ul>
+            <div id="noLinks" class="muted" style="margin-top:6px;">No links yet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav" aria-label="Bottom navigation">
+    <a href="./index.html" data-page="home">🏠 Home</a>
+    <a href="./agenda.html" data-page="agenda">🗓 Agenda</a>
+    <a href="./budget.html" data-page="budget">💰 Budget</a>
+  </nav>
+
+  <script>
+    // -----------------------------
+    // Storage keys (same as original)
+    // -----------------------------
+    const CHECKLIST_KEY = "hokkaido_trip_checklist_v1";
+    const NOTES_KEY = "hokkaido_trip_notes_v1";
+    const AGENDA_DAY_KEY = "hokkaido_trip_selected_day_v1";
+
+    // -----------------------------
+    // Data
+    // -----------------------------
+    const agendaDetails = {
+      d1: "Arrive CTS, JR to Sapporo, hotel check-in, dinner in Susukino.",
+      d2: "Otaru day trip: canal, Sakaimachi Street, seafood bowl, LeTAO dessert.",
+      d3: "Option A: Niseko ski day. Option B: Jozankei onsen and relax.",
+      d4: "Asahikawa: zoo visit + Asahikawa Ramen Village.",
+      d5: "Sapporo city: Odori Park, TV Tower, Nijo Market, Tanukikoji shopping.",
+      d6: "Noboribetsu day trip: Hell Valley + onsen.",
+      d7: "Last-minute shopping, transfer to CTS, fly back to HKG."
+    };
+
+    const dayLabels = {
+      d1: "15 Dec (Day 1)",
+      d2: "16 Dec (Day 2)",
+      d3: "17 Dec (Day 3)",
+      d4: "18 Dec (Day 4)",
+      d5: "19 Dec (Day 5)",
+      d6: "20 Dec (Day 6)",
+      d7: "21 Dec (Day 7)"
+    };
+
+    const defaultChecklistItems = [
+      "Passport / wallet / essentials",
+      "Transport route checked",
+      "Tickets / reservations ready",
+      "Weather + outfit ready",
+      "Power bank / charging cable packed"
+    ];
+
+    // -----------------------------
+    // Elements
+    // -----------------------------
+    const daySelect = document.getElementById("daySelect");
+    const dayDetail = document.getElementById("dayDetail");
+    const checklistContainer = document.getElementById("checklistContainer");
+    const dayNotes = document.getElementById("dayNotes");
+    const dayLinks = document.getElementById("dayLinks");
+    const savedLinksList = document.getElementById("savedLinksList");
+    const noLinks = document.getElementById("noLinks");
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function readJSON(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function writeJSON(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function currentDayKey() {
+      return daySelect.value;
+    }
+
+    function initBottomNav() {
+      const page = document.body.dataset.page;
+      document.querySelectorAll(".bottom-nav a").forEach(a => {
+        if (a.dataset.page === page) a.classList.add("active");
+      });
+    }
+
+    // -----------------------------
+    // Render functions
+    // -----------------------------
+    function renderDayDetail() {
+      dayDetail.textContent = agendaDetails[currentDayKey()] || "";
+    }
+
+    function renderChecklistAndNotes() {
+      const d = currentDayKey();
+
+      // checklist
+      const allChecklist = readJSON(CHECKLIST_KEY, {});
+      const dayState = allChecklist[d] || defaultChecklistItems.map(() => false);
+      checklistContainer.innerHTML = "";
+
+      defaultChecklistItems.forEach((item, idx) => {
+        const li = document.createElement("li");
+        li.className = "check-item";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = !!dayState[idx];
+        cb.setAttribute("aria-label", `${item} for ${dayLabels[d]}`);
+        cb.addEventListener("change", () => {
+          const latest = readJSON(CHECKLIST_KEY, {});
+          const arr = latest[d] || defaultChecklistItems.map(() => false);
+          arr[idx] = cb.checked;
+          latest[d] = arr;
+          writeJSON(CHECKLIST_KEY, latest);
+        });
+
+        const text = document.createElement("span");
+        text.textContent = item;
+
+        li.appendChild(cb);
+        li.appendChild(text);
+        checklistContainer.appendChild(li);
+      });
+
+      // notes + links
+      const allNotes = readJSON(NOTES_KEY, {});
+      dayNotes.value = allNotes[d]?.notes || "";
+      dayLinks.value = allNotes[d]?.links || "";
+      renderLinksPreview(dayLinks.value);
+    }
+
+    function renderLinksPreview(rawText) {
+      savedLinksList.innerHTML = "";
+      const lines = (rawText || "")
+        .split("\n")
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      if (!lines.length) {
+        noLinks.style.display = "block";
+        return;
+      }
+
+      noLinks.style.display = "none";
+
+      lines.forEach(url => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+
+        let href = url;
+        if (!/^https?:\/\//i.test(href)) href = "https://" + href;
+
+        a.href = href;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = url;
+
+        li.appendChild(a);
+        savedLinksList.appendChild(li);
+      });
+    }
+
+    function saveNotesForCurrentDay() {
+      const d = currentDayKey();
+      const allNotes = readJSON(NOTES_KEY, {});
+      allNotes[d] = {
+        notes: dayNotes.value,
+        links: dayLinks.value
+      };
+      writeJSON(NOTES_KEY, allNotes);
+    }
+
+    // -----------------------------
+    // Events
+    // -----------------------------
+    daySelect.addEventListener("change", () => {
+      localStorage.setItem(AGENDA_DAY_KEY, daySelect.value);
+      renderDayDetail();
+      renderChecklistAndNotes();
+    });
+
+    dayNotes.addEventListener("input", saveNotesForCurrentDay);
+
+    dayLinks.addEventListener("input", () => {
+      saveNotesForCurrentDay();
+      renderLinksPreview(dayLinks.value);
+    });
+
+    // -----------------------------
+    // Init
+    // -----------------------------
+    (function init() {
+      initBottomNav();
+
+      const savedDay = localStorage.getItem(AGENDA_DAY_KEY);
+      if (savedDay && agendaDetails[savedDay]) {
+        daySelect.value = savedDay;
+      }
+
+      renderDayDetail();
+      renderChecklistAndNotes();
+    })();
+
+    // Optional PWA service worker registration
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .catch(err => console.warn("Service Worker registration failed:", err));
+      });
+    }
+  </script>
+</body>
+</html>
 
