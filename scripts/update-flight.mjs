@@ -60,7 +60,7 @@ if (price == null) {
 
 const output = {
   priceHKD: price,
-  updatedAt: new Date().toISOString(),
+  lastUpdated: new Date().toISOString(),
   source: "Google Flights via SerpAPI"
 };
 
