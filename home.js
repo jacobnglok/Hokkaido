@@ -47,29 +47,32 @@
     }
   }
 
-  // ✅ Hong Kong time formatter (what you asked for)
-    function formatHongKongTime(dateInput) {
-      let raw = dateInput;
+  // Hong Kong time formatter
+  function formatHongKongTime(dateInput) {
+    let raw = dateInput;
 
-      // If format is "YYYY-MM-DD HH:mm:ss", normalize to UTC ISO
-      if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw)) {
-        raw = raw.replace(" ", "T") + "Z";
-      }
-
-      const d = new Date(raw);
-      if (Number.isNaN(d.getTime())) return "Invalid date";
-
-      return new Intl.DateTimeFormat("en-HK", {
-        timeZone: "Asia/Hong_Kong",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-      }).format(d);
+    // If format is "YYYY-MM-DD HH:mm:ss", normalize to UTC ISO
+    if (
+      typeof raw === "string" &&
+      /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(raw)
+    ) {
+      raw = raw.replace(" ", "T") + "Z";
     }
+
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) return "Invalid date";
+
+    return new Intl.DateTimeFormat("en-HK", {
+      timeZone: "Asia/Hong_Kong",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }).format(d);
+  }
 
   // -----------------------------
   // Currency Helper
@@ -110,7 +113,9 @@
 
     try {
       // Free endpoint (no key needed)
-      const res = await fetch(`https://open.er-api.com/v6/latest/${encodeURIComponent(from)}`);
+      const res = await fetch(
+        `https://open.er-api.com/v6/latest/${encodeURIComponent(from)}`
+      );
       const data = await res.json();
 
       if (!data || data.result !== "success" || !data.rates || data.rates[to] == null) {
@@ -145,10 +150,10 @@
     const savedTo = localStorage.getItem(STORAGE_KEYS.to);
 
     if (savedAmount != null) currencyEls.amount.value = savedAmount;
-    if (savedFrom && [...currencyEls.from.options].some(o => o.value === savedFrom)) {
+    if (savedFrom && [...currencyEls.from.options].some((o) => o.value === savedFrom)) {
       currencyEls.from.value = savedFrom;
     }
-    if (savedTo && [...currencyEls.to.options].some(o => o.value === savedTo)) {
+    if (savedTo && [...currencyEls.to.options].some((o) => o.value === savedTo)) {
       currencyEls.to.value = savedTo;
     }
   }
@@ -185,7 +190,7 @@
   const flightEls = {
     status: qs(["#flight-status"]),
     list: qs(["#flight-list", "#flight-container"]),
-    LastUpdated: qs(["#last-updated", "#flight-last-updated"])
+    lastUpdated: qs(["#last-updated", "#updated-at", "#flight-last-updated"])
   };
 
   function normalizeFlightItems(data) {
@@ -243,10 +248,15 @@
       const items = normalizeFlightItems(data);
       renderFlightList(items);
 
-      // LastUpdated from JSON preferred; fallback to now
-      const ts = data?.LastUpdated || new Date().toISOString();
-      if (flightEls.LastUpdated) {
-        flightEls.LastUpdated.textContent = `Last updated: ${formatHongKongTime(ts)} (HKT)`;
+      // Prefer timestamp from JSON; fallback to now
+      const ts =
+        data?.updatedAt ||
+        data?.lastUpdated ||
+        data?.LastUpdated ||
+        new Date().toISOString();
+
+      if (flightEls.lastUpdated) {
+        flightEls.lastUpdated.textContent = `Last updated: ${formatHongKongTime(ts)} (HKT)`;
       }
 
       if (flightEls.status) {
