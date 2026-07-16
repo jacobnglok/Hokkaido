@@ -1,5 +1,7 @@
 {
-  "priceHKD": 3472,
-  "lastUpdated": "2026-07-15T23:35:21.339Z",
-  "source": "Google Flights via SerpAPI"
+  "priceHKD": 4287,
+  "lastUpdated": "2026-07-16T01:52:11.835Z",
+  "source": "Google Flights via SerpAPI",
+  "airline": "Greater Bay Airlines (HB)",
+  "directOnly": true
 }
