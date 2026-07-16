@@ -39,68 +39,37 @@ const parsePrice = (v) => {
   return null;
 };
 
-const normalizeFlightNo = (seg) => {
-  // Handles formats like "880", "HB880", or separate airline_code + flight_number
-  const code = String(seg?.airline_code || seg?.airline_iata || "").toUpperCase();
-  const rawNo = String(seg?.flight_number || "").toUpperCase().replace(/\s+/g, "");
-  if (!rawNo) return "";
-  return rawNo.startsWith(code) ? rawNo : `${code}${rawNo}`;
-};
-
-const getOutboundSegments = (it) =>
-  it?.flights || it?.departure_flights || it?.outbound_flights || [];
-
-const getReturnSegments = (it) =>
-  it?.return_flights || it?.return || [];
-
-const isDirectLeg = (segments) => Array.isArray(segments) && segments.length === 1;
-
-const isRoute = (seg, from, to) => {
-  const dep = (seg?.departure_airport?.id || seg?.departure_airport || "").toUpperCase();
-  const arr = (seg?.arrival_airport?.id || seg?.arrival_airport || "").toUpperCase();
-  return dep === from && arr === to;
-};
-
-const isHBFlight = (seg, exactNo) => {
-  const airlineCode = (seg?.airline_code || seg?.airline_iata || "").toUpperCase();
-  const airlineName = (seg?.airline || "").toLowerCase();
-  const normalized = normalizeFlightNo(seg); // e.g. "HB880"
-  return (airlineCode === "HB" || airlineName.includes("greater bay")) && normalized === exactNo;
-};
-
+// Extra safety filter in code
 const all = [...(data?.best_flights ?? []), ...(data?.other_flights ?? [])];
 
-const exactMatches = all.filter((it) => {
-  const outSegs = getOutboundSegments(it);
-  const retSegs = getReturnSegments(it);
+const isDirect = (it) => (it?.layovers?.length ?? 0) === 0;
+const isGBA = (it) =>
+  (it?.flights ?? []).every((seg) => {
+    const code = (seg?.airline_code || seg?.airline_iata || "").toUpperCase();
+    const name = (seg?.airline || "").toLowerCase();
+    return code === "HB" || name.includes("greater bay");
+  });
 
-  if (!isDirectLeg(outSegs) || !isDirectLeg(retSegs)) return false;
-
-  const out = outSegs[0];
-  const ret = retSegs[0];
-
-  const outboundOk =
-    isRoute(out, "HKG", "CTS") &&
-    isHBFlight(out, "HB880");
-
-  const returnOk =
-    isRoute(ret, "CTS", "HKG") &&
-    isHBFlight(ret, "HB881");
-
-  return outboundOk && returnOk;
-});
+const matches = all.filter((it) => isDirect(it) && isGBA(it));
 
 let price = null;
-for (const it of exactMatches) {
+for (const it of matches) {
   price = parsePrice(it?.price);
   if (price != null) break;
 }
 
 if (price == null) {
-  console.log("No exact HB880/HB881 round-trip found.");
-  console.log("best_flights:", data?.best_flights?.length ?? 0);
-  console.log("other_flights:", data?.other_flights?.length ?? 0);
-  throw new Error("No matching HB880 outbound + HB881 return fare found");
+  console.log("No direct Greater Bay result found.");
+  throw new Error("No direct Greater Bay Airlines price found in API response");
 }
 
-const
+const output = {
+  priceHKD: price,
+  lastUpdated: new Date().toISOString(),
+  source: "Google Flights via SerpAPI",
+  airline: "Greater Bay Airlines (HB)",
+  directOnly: true
+};
+
+await writeFile("flight.json", JSON.stringify(output, null, 2), "utf-8");
+console.log("flight.json updated:", output);
