@@ -16,9 +16,7 @@
       --brand:#2563eb;
       --brand-soft:#eff6ff;
     }
-
     *{box-sizing:border-box}
-
     body{
       margin:0;
       background:var(--bg);
@@ -27,16 +25,13 @@
       line-height:1.45;
       padding-bottom:calc(72px + env(safe-area-inset-bottom));
     }
-
     .container{
       max-width:1100px;
       margin:24px auto;
       padding:0 16px 24px;
     }
-
     h1{margin:0 0 6px;font-size:1.8rem}
     .subtitle{color:var(--muted); margin-bottom:20px}
-
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -45,22 +40,18 @@
       margin-bottom:16px;
       box-shadow:0 2px 8px rgba(0,0,0,0.03);
     }
-
     h2{
       font-size:1.1rem;
       margin:0 0 12px;
     }
-
     .row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       align-items:center;
     }
-
     .muted{color:var(--muted)}
-
-    select, textarea{
+    select, textarea, input{
       border:1px solid var(--line);
       border-radius:10px;
       padding:10px 12px;
@@ -68,19 +59,16 @@
       background:#fff;
       color:var(--text);
     }
-
     select{
       min-height:44px;
       cursor:pointer;
       min-width:220px;
     }
-
     textarea{
       width:100%;
       min-height:110px;
       resize:vertical;
     }
-
     .detail-box{
       margin-top:10px;
       padding:12px;
@@ -88,14 +76,12 @@
       border-radius:10px;
       background:#fafafa;
     }
-
     .two-col{
       display:grid;
       grid-template-columns:1fr;
       gap:12px;
       margin-top:12px;
     }
-
     .checklist-list{
       margin:0;
       padding:0;
@@ -103,7 +89,6 @@
       display:grid;
       gap:8px;
     }
-
     .check-item{
       display:flex;
       align-items:flex-start;
@@ -113,14 +98,12 @@
       border-radius:10px;
       padding:10px;
     }
-
     .check-item input[type="checkbox"]{
       width:20px;
       height:20px;
       margin-top:2px;
       accent-color:var(--brand);
     }
-
     .saved-links{
       margin-top:10px;
       padding:10px;
@@ -128,24 +111,19 @@
       border:1px dashed var(--line);
       border-radius:10px;
     }
-
     .saved-links ul{
       margin:8px 0 0;
       padding-left:18px;
     }
-
     .saved-links a{
       color:var(--brand);
       text-decoration:none;
       word-break:break-all;
     }
-
     :focus-visible{
       outline:3px solid #93c5fd;
       outline-offset:2px;
     }
-
-    /* Bottom nav */
     .bottom-nav{
       position:fixed;
       left:0;
@@ -158,7 +136,6 @@
       z-index:999;
       padding-bottom:env(safe-area-inset-bottom);
     }
-
     .bottom-nav a{
       text-align:center;
       padding:12px 6px;
@@ -171,16 +148,13 @@
       align-items:center;
       justify-content:center;
     }
-
     .bottom-nav a.active{
       color:var(--brand);
       background:var(--brand-soft);
     }
-
     @media (min-width:700px){
       .two-col{grid-template-columns:1fr 1fr;}
     }
-
     @media (max-width:640px){
       .row > *{width:100%}
       select{width:100%}
@@ -219,17 +193,14 @@
 
         <div class="detail-box">
           <strong>Notes + Links (per day)</strong>
-
           <div style="margin-top:10px;">
             <label for="dayNotes"><strong>Notes</strong></label>
             <textarea id="dayNotes" placeholder="e.g., dinner at 7pm, train platform info..."></textarea>
           </div>
-
           <div style="margin-top:10px;">
             <label for="dayLinks"><strong>Links (one URL per line)</strong></label>
             <textarea id="dayLinks" placeholder="https://..."></textarea>
           </div>
-
           <div class="saved-links" id="savedLinksPreview">
             <strong>Saved links preview</strong>
             <ul id="savedLinksList"></ul>
@@ -237,10 +208,26 @@
           </div>
         </div>
       </div>
+
+      <!-- Tiny Stay Box -->
+      <div class="detail-box" style="max-width:420px;">
+        <strong>Stay</strong>
+        <div style="margin-top:8px;">
+          Location: <span id="stayLocation">-</span>
+        </div>
+        <div style="margin-top:8px;">
+          <input
+            id="hotelLink"
+            type="url"
+            placeholder="Paste hotel/Airbnb link..."
+            style="width:100%; min-height:40px; border:1px solid var(--line); border-radius:8px; padding:8px 10px;"
+          />
+        </div>
+        <div id="hotelPreview" style="margin-top:8px;"></div>
+      </div>
     </section>
   </div>
 
-  <!-- Bottom Navigation -->
   <nav class="bottom-nav" aria-label="Bottom navigation">
     <a href="./index.html" data-page="home">🏠 Home</a>
     <a href="./agenda.html" data-page="agenda">🗓 Agenda</a>
@@ -249,11 +236,12 @@
 
   <script>
     // -----------------------------
-    // Storage keys (same as original)
+    // Storage keys
     // -----------------------------
     const CHECKLIST_KEY = "hokkaido_trip_checklist_v1";
     const NOTES_KEY = "hokkaido_trip_notes_v1";
     const AGENDA_DAY_KEY = "hokkaido_trip_selected_day_v1";
+    const HOTEL_LINK_KEY = "hokkaido_trip_hotel_links_v1";
 
     // -----------------------------
     // Data
@@ -280,6 +268,17 @@
       d8: "22 Dec (Day 8)"
     };
 
+    const dayLocation = {
+      d1: "札幌",
+      d2: "小樽",
+      d3: "二世谷",
+      d4: "洞爺湖 / 登別",
+      d5: "登別 / 札幌",
+      d6: "富良野 / 旭川",
+      d7: "美瑛 / 札幌",
+      d8: "札幌"
+    };
+
     const defaultChecklistItems = [
       "TamB💕",
       "扑嘢🍆💦💥",
@@ -300,6 +299,10 @@
     const dayLinks = document.getElementById("dayLinks");
     const savedLinksList = document.getElementById("savedLinksList");
     const noLinks = document.getElementById("noLinks");
+
+    const stayLocation = document.getElementById("stayLocation");
+    const hotelLink = document.getElementById("hotelLink");
+    const hotelPreview = document.getElementById("hotelPreview");
 
     // -----------------------------
     // Helpers
@@ -387,19 +390,15 @@
       }
 
       noLinks.style.display = "none";
-
       lines.forEach(url => {
         const li = document.createElement("li");
         const a = document.createElement("a");
-
         let href = url;
         if (!/^https?:\/\//i.test(href)) href = "https://" + href;
-
         a.href = href;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.textContent = url;
-
         li.appendChild(a);
         savedLinksList.appendChild(li);
       });
@@ -415,6 +414,25 @@
       writeJSON(NOTES_KEY, allNotes);
     }
 
+    function renderStayMini() {
+      const d = currentDayKey();
+      stayLocation.textContent = dayLocation[d] || "-";
+
+      const allLinks = readJSON(HOTEL_LINK_KEY, {});
+      const link = allLinks[d] || "";
+      hotelLink.value = link;
+
+      if (!link.trim()) {
+        hotelPreview.innerHTML = '<span class="muted">No hotel link yet.</span>';
+        return;
+      }
+
+      let href = link.trim();
+      if (!/^https?:\/\//i.test(href)) href = "https://" + href;
+
+      hotelPreview.innerHTML = `<a href="${href}" target="_blank" rel="noopener noreferrer">Open hotel link</a>`;
+    }
+
     // -----------------------------
     // Events
     // -----------------------------
@@ -422,13 +440,21 @@
       localStorage.setItem(AGENDA_DAY_KEY, daySelect.value);
       renderDayDetail();
       renderChecklistAndNotes();
+      renderStayMini();
     });
 
     dayNotes.addEventListener("input", saveNotesForCurrentDay);
-
     dayLinks.addEventListener("input", () => {
       saveNotesForCurrentDay();
       renderLinksPreview(dayLinks.value);
+    });
+
+    hotelLink.addEventListener("input", () => {
+      const d = currentDayKey();
+      const allLinks = readJSON(HOTEL_LINK_KEY, {});
+      allLinks[d] = hotelLink.value.trim();
+      writeJSON(HOTEL_LINK_KEY, allLinks);
+      renderStayMini();
     });
 
     // -----------------------------
@@ -436,14 +462,13 @@
     // -----------------------------
     (function init() {
       initBottomNav();
-
       const savedDay = localStorage.getItem(AGENDA_DAY_KEY);
       if (savedDay && agendaDetails[savedDay]) {
         daySelect.value = savedDay;
       }
-
       renderDayDetail();
       renderChecklistAndNotes();
+      renderStayMini();
     })();
 
     // Optional PWA service worker registration
@@ -457,4 +482,3 @@
   </script>
 </body>
 </html>
-
